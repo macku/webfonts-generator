@@ -52,7 +52,9 @@ var makeSrc = function(options, urls) {
 
 var makeCtx = function(options, urls) {
 	// Transform codepoints to hex strings
-	var codepoints = _.object(_.map(options.codepoints, function(codepoint, name) {
+	var codepoints = _.object(_.map(options.codepoints, function(codepoints, name) {
+		var codepoint = Array.isArray(codepoints) ? codepoints[0] : codepoints
+
 		return [name, codepoint.toString(16)]
 	}))
 

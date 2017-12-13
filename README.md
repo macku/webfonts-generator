@@ -219,6 +219,15 @@ Type: `object`
 Specific codepoints for certain icons.
 Icons without codepoints will have codepoints incremented from `startCodepoint` skipping duplicates.
 
+```js
+{
+    "my-foo-icon": 0xf0f0, // Single glyph unicode code as a hex number
+    "bar-icon": [0xff01, 0xff99], // You can pass multiple glyph codes for the same icon
+    "moo-icon": 65433 // or use a decimal number value
+}
+
+```
+
 ### fontName, normalize, fontHeight, round, descent
 
 Options that are passed directly to
