@@ -10,6 +10,10 @@ var getFileType = require('file-type')
 
 var webfontsGenerator = require('../src/index')
 
+function codepointInSvg(svg, cp) {
+    return svg.indexOf(cp.toString(16).toUpperCase()) !== -1
+}
+
 describe('webfont', function() {
 	var SRC = path.join(__dirname, 'src')
 	var DEST = path.join(__dirname, 'dest')
@@ -115,17 +119,35 @@ describe('webfont', function() {
 
 			var svg = fs.readFileSync(path.join(DEST, FONT_NAME + '.svg'), 'utf8')
 
-			function codepointInSvg(cp) {
-				return svg.indexOf(cp.toString(16).toUpperCase()) !== -1
-			}
-
-			assert(codepointInSvg(START_CODEPOINT), 'startCodepoint used')
-			assert(codepointInSvg(START_CODEPOINT+1), 'startCodepoint incremented')
-			assert(codepointInSvg(CODEPOINTS.close), 'codepoints used')
+			assert(codepointInSvg(svg, START_CODEPOINT), 'startCodepoint used')
+			assert(codepointInSvg(svg, START_CODEPOINT+1), 'startCodepoint incremented')
+			assert(codepointInSvg(svg, CODEPOINTS.close), 'codepoints used')
 
 			done()
 		})
 	})
+
+	it('allows to pass multiple codepoints for the same icon', function(done) {
+        var CODEPOINTS = {
+            back: [0xEE, 0xEF],
+            close: [0xFF, 0xFE]
+        }
+        var options = _.extend({}, OPTIONS, {
+            codepoints: CODEPOINTS,
+        })
+        webfontsGenerator(options, function(err) {
+            if (err) return done(err)
+
+            var svg = fs.readFileSync(path.join(DEST, FONT_NAME + '.svg'), 'utf8')
+
+            assert(codepointInSvg(svg, CODEPOINTS.close[0]), 'first codepoint for close icon used')
+            assert(codepointInSvg(svg, CODEPOINTS.close[1]), 'second codepoint for close icon used')
+            assert(codepointInSvg(svg, CODEPOINTS.back[0]), 'first codepoint for back icon used')
+            assert(codepointInSvg(svg, CODEPOINTS.back[1]), 'second codepoint for back icon used')
+
+            done()
+        })
+    })
 
 	it('generates html file when options.html is true', function(done) {
 		var options = _.extend({}, OPTIONS, {html: true})
